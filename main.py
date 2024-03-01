@@ -1,6 +1,11 @@
 # This file was created by: Tyler Marshall
 #added this comment to prove github is listening
 # importing pygame
+
+'''
+adding a health class, health power up, and a lootbox to the game engine
+'''
+
 import pygame as pg
 from settings import *
 from sprites import *
