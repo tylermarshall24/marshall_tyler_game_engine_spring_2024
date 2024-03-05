@@ -71,7 +71,7 @@ class Player(pg.sprite.Sprite):
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "PowerUp":
                 print(hits[0].__class__.__name__)
-                self.speed += 25
+                self.speed += 35
 
  
     def update(self):
