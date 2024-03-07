@@ -1,49 +1,59 @@
 # this file was created by: Tyler Marshall
 # this code inspired by Zelda and informed by Chris Bradfield
+
 import pygame as pg
 from settings import *
+from utils import *
+from random import choice
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
-        # initilize super class
+        # init super class
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        # added player image to sprite from the game class...
+        self.image = game.player_img
+        # self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.moneybag = 0
         self.speed = 300
-   
+        self.status = ""
+        self.hitpoints = 100
+        self.cooling = False
+    
     def get_keys(self):
-        self.vx, self.vy = 0, 0
+        self.vx, self.vy = 0, 0 
         keys = pg.key.get_pressed()
+        if keys[pg.K_t]:
+            self.game.test_timer.event_reset()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vx = -PLAYER_SPEED 
+            self.vx = -self.speed
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vx = PLAYER_SPEED  
+            self.vx = self.speed
         if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vy = -PLAYER_SPEED  
+            self.vy = -self.speed  
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vy = PLAYER_SPEED
+            self.vy = self.speed
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
- 
+
     # def move(self, dx=0, dy=0):
     #     if not self.collide_with_walls(dx, dy):
     #         self.x += dx
     #         self.y += dy
- 
+
     # def collide_with_walls(self, dx=0, dy=0):
     #     for wall in self.game.walls:
     #         if wall.x == self.x + dx and wall.y == self.y + dy:
     #             return True
     #     return False
-           
+            
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -63,7 +73,8 @@ class Player(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
-# defines when player collides with coins (kill)
+    
+    # made possible by Aayush's question!
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
@@ -71,11 +82,23 @@ class Player(pg.sprite.Sprite):
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "PowerUp":
                 print(hits[0].__class__.__name__)
-                self.speed += 35
+                effect = choice(POWER_UP_EFFECTS)
+                self.game.cooldown.cd = 5
+                self.cooling = True
+                print(effect)
+                print(self.cooling)
+                if effect == "Invincible":
+                    self.status = "Invincible"
+            if str(hits[0].__class__.__name__) == "Mob":
+                # print(hits[0].__class__.__name__)
+                # print("Collided with mob")
+                # self.hitpoints -= 1
+                if self.status == "Invincible":
+                    print("you can't hurt me")
 
- 
     def update(self):
         self.get_keys()
+        # self.power_up_cd.ticking()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x
@@ -85,13 +108,16 @@ class Player(pg.sprite.Sprite):
         # add collision later
         self.collide_with_walls('y')
         self.collide_with_group(self.game.coins, True)
-        self.collide_with_group(self.game.power_ups, True)
-         
+        if self.game.cooldown.cd < 1:
+            self.cooling = False
+        if not self.cooling:
+            self.collide_with_group(self.game.power_ups, True)
+        self.collide_with_group(self.game.mobs, False)
+          
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
         #     print("I got a coin")
-       
- 
+        
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
@@ -104,7 +130,7 @@ class Wall(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
- 
+
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.coins
@@ -117,7 +143,7 @@ class Coin(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-        
+
 class PowerUp(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.power_ups
@@ -130,7 +156,7 @@ class PowerUp(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-
+        
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
@@ -172,6 +198,6 @@ class Mob(pg.sprite.Sprite):
         if self.rect.y > self.game.player.rect.y:
             self.vy = -100
         self.rect.x = self.x
-        self.collide_with_walls('x')
+        # self.collide_with_walls('x')
         self.rect.y = self.y
-        self.collide_with_walls('y')
+        # self.collide_with_walls('y')

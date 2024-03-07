@@ -9,24 +9,33 @@ adding a health class, health power up, and a lootbox to the game engine
 import pygame as pg
 from settings import *
 from sprites import *
+from utils import *
 from random import randint
 import sys
 from os import path
 
-# Define game clas
+# added this math function to round down the clock
+from math import floor
+
+
+
+# Define game class...
 class Game:
-    # define init self 
+    # Define a special method to init the properties of said class...
     def __init__(self):
-        # initilize py game
+        # init pygame
         pg.init()
-        #
+        # set size of screen and be the screen
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
-        # 
+        # setting game clock 
         self.clock = pg.time.Clock()
         self.load_data()
+        # added images folder and image in the load_data method for use with the player
     def load_data(self):
         game_folder = path.dirname(__file__)
+        img_folder = path.join(game_folder, 'images')
+        self.player_img = pg.image.load(path.join(img_folder, 'autobot.png')).convert_alpha()
         self.map_data = []
         '''
         The with statement is a context manager in Python. 
@@ -38,15 +47,19 @@ class Game:
                 print(line)
                 self.map_data.append(line)
 
-    
+    # Create run method which runs the whole GAME
     def new(self):
+        # create timer
+        self.cooldown = Timer(self)
         print("create new game...")
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.power_ups = pg.sprite.Group()
-        # 
+        # self.player1 = Player(self, 1, 1)
+        # for x in range(10, 20):
+        #     Wall(self, x, 5)
         for row, tiles in enumerate(self.map_data):
             print(row)
             for col, tile in enumerate(tiles):
@@ -57,10 +70,10 @@ class Game:
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'C':
-                    self.player = Coin(self, col, row)              
+                    Coin(self, col, row)
                 if tile == 'M':
                     Mob(self, col, row)
-                if tile == 'U':               
+                if tile == 'U':
                     PowerUp(self, col, row)
 
     def run(self):
@@ -76,6 +89,8 @@ class Game:
          sys.exit()
 
     def update(self):
+        # tick the test timer
+        self.cooldown.ticking()
         self.all_sprites.update()
     
     def draw_grid(self):
@@ -91,11 +106,15 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x,y)
         surface.blit(text_surface, text_rect)
-
+    
     def draw(self):
             self.screen.fill(BGCOLOR)
-            self.draw_grid()
+            # self.draw_grid()
             self.all_sprites.draw(self.screen)
+            # draw the timer
+            self.draw_text(self.screen, str(self.cooldown.current_time), 24, WHITE, WIDTH/2 - 32, 2)
+            self.draw_text(self.screen, str(self.cooldown.event_time), 24, WHITE, WIDTH/2 - 32, 80)
+            self.draw_text(self.screen, str(self.cooldown.get_countdown()), 24, WHITE, WIDTH/2 - 32, 120)
             pg.display.flip()
 
     def events(self):
@@ -111,13 +130,28 @@ class Game:
             #         self.player.move(dy=-1)
             #     if event.key == pg.K_DOWN:
             #         self.player.move(dy=1)
+    def show_start_screen(self):
+        self.screen.fill(BGCOLOR)
+        self.draw_text(self.screen, "This is the start screen", 24, WHITE, WIDTH/2 - 32, 2)
+        pg.display.flip()
+        self.wait_for_key()
+    
+    def wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.quit()
+                if event.type == pg.KEYUP:
+                    waiting = False
 
 # Instantiate the game... 
 g = Game()
 # use game method run to run
-# g.show_start_screen()
+g.show_start_screen()
 while True:
     g.new()
     g.run()
     # g.show_go_screen()
-      
