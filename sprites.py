@@ -1,10 +1,34 @@
 # this file was created by: Tyler Marshall
 # this code inspired by Zelda and informed by Chris Bradfield
 
+# This file was created by: Chris Cozort
+# This code was inspired by Zelda and informed by Chris Bradfield
 import pygame as pg
 from settings import *
 from utils import *
 from random import choice
+
+vec =pg.math.Vector2
+
+def collide_with_walls(sprite, group, dir):
+    if dir == 'x':
+        hits = pg.sprite.spritecollide(sprite, group, False)
+        if hits:
+            if hits[0].rect.centerx > sprite.rect.centerx:
+                sprite.pos.x = hits[0].rect.left - sprite.rect.width / 2
+            if hits[0].rect.centerx < sprite.rect.centerx:
+                sprite.pos.x = hits[0].rect.right + sprite.rect.width / 2
+            sprite.vel.x = 0
+            sprite.rect.centerx = sprite.pos.x
+    if dir == 'y':
+        hits = pg.sprite.spritecollide(sprite, group, False)
+        if hits:
+            if hits[0].rect.centery > sprite.rect.centery:
+                sprite.pos.y = hits[0].rect.top - sprite.rect.height / 2
+            if hits[0].rect.centery < sprite.rect.centery:
+                sprite.pos.y = hits[0].rect.bottom + sprite.rect.height / 2
+            sprite.vel.y = 0
+            sprite.rect.centery = sprite.pos.y
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -25,12 +49,13 @@ class Player(pg.sprite.Sprite):
         self.status = ""
         self.hitpoints = 100
         self.cooling = False
+        self.pos = vec(0,0)
     
     def get_keys(self):
         self.vx, self.vy = 0, 0 
         keys = pg.key.get_pressed()
         if keys[pg.K_t]:
-            self.game.test_timer.event_reset()
+            self.game.test_method()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.vx = -self.speed
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
@@ -39,9 +64,16 @@ class Player(pg.sprite.Sprite):
             self.vy = -self.speed  
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vy = self.speed
+        if keys[pg.K_e]:
+            print("trying to shoot...")
+            self.pew()
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
+    def pew(self):
+        p = PewPew(self.game, self.rect.x, self.rect.y)
+        print(p.rect.x)
+        print(p.rect.y)
 
     # def move(self, dx=0, dy=0):
     #     if not self.collide_with_walls(dx, dy):
@@ -118,6 +150,30 @@ class Player(pg.sprite.Sprite):
         # if coin_hits:
         #     print("I got a coin")
         
+class PewPew(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.pew_pews
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
+        self.image.fill(ORANGE)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = 10
+        print("I created a pew pew...")
+    def collide_with_group(self, group, kill):
+        hits = pg.sprite.spritecollide(self, group, kill)
+        # if hits:
+        #     if str(hits[0].__class__.__name__) == "Coin":
+        #         self.moneybag += 1
+    def update(self):
+        self.collide_with_group(self.game.coins, True)
+        self.rect.y -= self.speed
+        # pass
+
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
@@ -162,8 +218,9 @@ class Mob(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        # self.image.fill(RED)
+        self.image = self.game.mob_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -198,6 +255,45 @@ class Mob(pg.sprite.Sprite):
         if self.rect.y > self.game.player.rect.y:
             self.vy = -100
         self.rect.x = self.x
-        # self.collide_with_walls('x')
+        self.collide_with_walls('x')
         self.rect.y = self.y
-        # self.collide_with_walls('y')
+        self.collide_with_walls('y')
+
+
+class Mob2(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.mobs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        # self.image = game.mob_img
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        # self.image.fill(ORANGE)
+        self.image = self.game.mob_img
+        self.rect = self.image.get_rect()
+        # self.hit_rect = MOB_HIT_RECT.copy()
+        # self.hit_rect.center = self.rect.center
+        self.pos = vec(x, y) * TILESIZE
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.rect.center = self.pos
+        self.rot = 0
+        # added
+        self.speed = 150
+        # self.health = MOB_HEALTH
+
+    def update(self):
+        self.rot = (self.game.player.rect.center - self.pos).angle_to(vec(1, 0))
+        # self.image = pg.transform.rotate(self.image, 45)
+        # self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        self.acc = vec(self.speed, 0).rotate(-self.rot)
+        self.acc += self.vel * -1
+        self.vel += self.acc * self.game.dt
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+        # self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.walls, 'x')
+        # self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.walls, 'y')
+        # self.rect.center = self.hit_rect.center
+        # if self.health <= 0:
+        #     self.kill()
