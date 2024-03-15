@@ -218,9 +218,10 @@ class Mob(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
-        # self.image.fill(RED)
-        self.image = self.game.mob_img
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(RED)
+        self.sky = pg.image.load('sky.png')
+        self.image = self.game.sky.png
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -258,6 +259,7 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
+    
 
 
 class Mob2(pg.sprite.Sprite):
@@ -265,10 +267,10 @@ class Mob2(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        # self.image = game.mob_img
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
-        # self.image.fill(ORANGE)
-        self.image = self.game.mob_img
+        self.image = game.sky.png
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(ORANGE)
+        self.image = self.game.sky.png
         self.rect = self.image.get_rect()
         # self.hit_rect = MOB_HIT_RECT.copy()
         # self.hit_rect.center = self.rect.center

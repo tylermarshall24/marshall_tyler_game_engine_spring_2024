@@ -35,7 +35,7 @@ class Game:
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'images')
-        self.player_img = pg.image.load(path.join(img_folder, 'autobot.png')).convert_alpha()
+        self.player_img = pg.image.load(path.join(img_folder, 'cat.png')).convert_alpha()
         self.map_data = []
         '''
         The with statement is a context manager in Python. 
@@ -154,4 +154,4 @@ g.show_start_screen()
 while True:
     g.new()
     g.run()
-    # g.show_go_screen()
+    g.show_go_screen()
