@@ -7,6 +7,7 @@ import pygame as pg
 from settings import *
 from utils import *
 from random import choice
+from os import path
 
 vec =pg.math.Vector2
 
@@ -220,8 +221,7 @@ class Mob(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(RED)
-        self.sky = pg.image.load('./marshall_tyler_game_engine_spring_2024/images/sky.png')
-        self.image = self.sky
+        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'sky.png')).convert_alpha(), (TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
