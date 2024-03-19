@@ -220,8 +220,8 @@ class Mob(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(RED)
-        self.sky = pg.image.load('sky.png')
-        self.image = self.game.sky.png
+        self.sky = pg.image.load('./marshall_tyler_game_engine_spring_2024/images/sky.png')
+        self.image = self.sky
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -260,6 +260,7 @@ class Mob(pg.sprite.Sprite):
         self.rect.y = self.y
         self.collide_with_walls('y')
     
+
 
 
 class Mob2(pg.sprite.Sprite):
