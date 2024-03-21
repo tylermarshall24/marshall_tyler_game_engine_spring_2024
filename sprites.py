@@ -1,8 +1,7 @@
 # this file was created by: Tyler Marshall
 # this code inspired by Zelda and informed by Chris Bradfield
 
-# This file was created by: Chris Cozort
-# This code was inspired by Zelda and informed by Chris Bradfield
+
 import pygame as pg
 from settings import *
 from utils import *
@@ -51,6 +50,7 @@ class Player(pg.sprite.Sprite):
         self.hitpoints = 100
         self.cooling = False
         self.pos = vec(0,0)
+        self.vaulthit = 0    
     
     def get_keys(self):
         self.vx, self.vy = 0, 0 
@@ -128,28 +128,27 @@ class Player(pg.sprite.Sprite):
                 # self.hitpoints -= 1
                 if self.status == "Invincible":
                     print("you can't hurt me")
+            
+
+                
 
     def update(self):
         self.get_keys()
         # self.power_up_cd.ticking()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
+        # this order of operations for rect settings and collision is imperative
         self.rect.x = self.x
-        # add collision later
         self.collide_with_walls('x')
         self.rect.y = self.y
-        # add collision later
         self.collide_with_walls('y')
+        # added coin collection with a cooldown setting
         self.collide_with_group(self.game.coins, True)
         if self.game.cooldown.cd < 1:
             self.cooling = False
         if not self.cooling:
             self.collide_with_group(self.game.power_ups, True)
         self.collide_with_group(self.game.mobs, False)
-          
-        # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
-        # if coin_hits:
-        #     print("I got a coin")
         
 class PewPew(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -167,9 +166,9 @@ class PewPew(pg.sprite.Sprite):
         print("I created a pew pew...")
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
-        # if hits:
-        #     if str(hits[0].__class__.__name__) == "Coin":
-        #         self.moneybag += 1
+        if hits:
+            if str(hits[0].__class__.__name__) == "Coin":
+                self.moneybag += 1
     def update(self):
         self.collide_with_group(self.game.coins, True)
         self.rect.y -= self.speed

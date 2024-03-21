@@ -3,7 +3,7 @@
 # importing pygame
 
 '''
-adding a health class, health power up, and a lootbox to the game engine
+adding pngs to player and mobs, a start screen, and a win/restart screen to the game engine
 '''
 
 import pygame as pg
@@ -75,6 +75,9 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
+                
+        
+
 
     def run(self):
         # 
@@ -116,6 +119,10 @@ class Game:
             self.draw_text(self.screen, str(self.cooldown.event_time), 24, WHITE, WIDTH/2 - 32, 80)
             self.draw_text(self.screen, str(self.cooldown.get_countdown()), 24, WHITE, WIDTH/2 - 32, 120)
             pg.display.flip()
+            # win screen after  coins collected
+            if self.player.moneybag == 5:
+                self.screen.fill(BGCOLOR)
+                self.draw_text(self.screen, str("You won!"), 64, WHITE, 1, 1) 
 
     def events(self):
          for event in pg.event.get():
@@ -132,9 +139,30 @@ class Game:
             #         self.player.move(dy=1)
     def show_start_screen(self):
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "-: Press Space to Start :-", 24, WHITE, WIDTH/2 - 32, 2)
+        self.draw_text(self.screen, "-: Press Space to Start :-", 24, WHITE, WIDTH/2 - 32, 32)
         pg.display.flip()
         self.wait_for_key()
+
+    # end screen that appears after 5 coins collected and automatically closes game after countdown
+    def draw(self):
+        self.screen.fill(BGCOLOR)
+        # self.draw_grid()
+        self.all_sprites.draw(self.screen)
+        # draw the timer
+        self.draw_text(self.screen, str(self.cooldown.current_time), 24, WHITE, WIDTH/2 - 32, 2)
+        self.draw_text(self.screen, str(self.cooldown.event_time), 24, WHITE, WIDTH/2 - 32, 80)
+        self.draw_text(self.screen, str(self.cooldown.get_countdown()), 24, WHITE, WIDTH/2 - 32, 120)
+        pg.display.flip()
+        # Win screen after 5 coins collected
+        if self.player.moneybag == 5:
+            for i in range(5, 0, -1):  # Countdown from 5 to 1
+                self.screen.fill(BGCOLOR)
+                self.draw_text(self.screen, "You won!", 64, WHITE, WIDTH/2 - 120, HEIGHT/2 - 32)
+                self.draw_text(self.screen, f"Closing in {i} seconds...", 32, WHITE, WIDTH/2 - 160, HEIGHT/2 + 32)
+                pg.display.flip()
+                pg.time.wait(1000)  # Wait for 1 second
+            self.quit()
+
     
     def wait_for_key(self):
         waiting = True
