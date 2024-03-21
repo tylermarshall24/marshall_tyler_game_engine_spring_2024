@@ -221,7 +221,7 @@ class Mob(pg.sprite.Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(RED)
-        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'sky.png')).convert_alpha(), (TILESIZE, TILESIZE))
+        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'goomba.png')).convert_alpha(), (TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -268,10 +268,10 @@ class Mob2(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.sky.png
+        self.image = game.goomba.png
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(ORANGE)
-        self.image = self.game.sky.png
+        self.image = self.game.goomba.png
         self.rect = self.image.get_rect()
         # self.hit_rect = MOB_HIT_RECT.copy()
         # self.hit_rect.center = self.rect.center
