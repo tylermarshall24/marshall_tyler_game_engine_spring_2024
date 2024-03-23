@@ -10,6 +10,7 @@ from os import path
 
 vec =pg.math.Vector2
 
+# making it impossible for the player to go through walls
 def collide_with_walls(sprite, group, dir):
     if dir == 'x':
         hits = pg.sprite.spritecollide(sprite, group, False)
@@ -174,6 +175,7 @@ class PewPew(pg.sprite.Sprite):
         self.rect.y -= self.speed
         # pass
 
+#create class for walls
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
@@ -187,6 +189,7 @@ class Wall(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
+#create class for coins
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.coins
@@ -200,6 +203,7 @@ class Coin(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
+#create class for powerups
 class PowerUp(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.power_ups
@@ -212,7 +216,8 @@ class PowerUp(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-        
+
+#creating class for mob 2 (wont be used in my version)
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
@@ -228,6 +233,7 @@ class Mob(pg.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.speed = 1
+        #what happens when player collides with mob
     def collide_with_walls(self, dir):
         if dir == 'x':
             # print('colliding on the x')
@@ -261,7 +267,7 @@ class Mob(pg.sprite.Sprite):
     
 
 
-
+#creating class for mob (goomba)
 class Mob2(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
@@ -282,6 +288,7 @@ class Mob2(pg.sprite.Sprite):
         # added
         self.speed = 150
         # self.health = MOB_HEALTH
+    
 
     def update(self):
         self.rot = (self.game.player.rect.center - self.pos).angle_to(vec(1, 0))

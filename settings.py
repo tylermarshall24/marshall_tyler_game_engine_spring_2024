@@ -7,7 +7,7 @@ TITLE = "My Fun Game"
 
 TILESIZE = 32
 
-
+# defining colors with values of RGB
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 BGCOLOR = (0,0,0)
