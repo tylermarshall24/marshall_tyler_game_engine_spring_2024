@@ -183,3 +183,11 @@ while True:
     g.new()
     g.run()
     g.show_go_screen()
+
+    '''
+    primary goal: add more levels and a boss fight
+    
+    secondary goal: add animation to sprites
+    
+    release verison: add graphics in the backgorund like a map to traverse around
+    '''
