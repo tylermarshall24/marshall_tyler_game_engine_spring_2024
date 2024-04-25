@@ -75,6 +75,8 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
+                if tile == 'D':
+                    Door(self, col, row)
                 
         
 
