@@ -212,7 +212,7 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'U':
                     PowerUp(self, col, row)
-                 if tile == 'D' :
+                if tile == 'D' :
                      Door(self, col, row)
 
 # Instantiate the game... 

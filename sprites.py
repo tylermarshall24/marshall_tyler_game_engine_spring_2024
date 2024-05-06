@@ -215,19 +215,19 @@ class Wall(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
 
 # #create class for unlockable door that opens after key is collected
- class Door(pg.sprite.Sprite):
+class Door(pg.sprite.Sprite):
      def __init__(self, game, x, y):
          self.groups = game.all_sprites, game.doors
          pg.sprite.Sprite.__init__(self, self.groups)
          self.game = game
-            self.image = pg.Surface((TILESIZE, TILESIZE))
-            self.image.fill(RED)  #change color to represent a door
-            self.rect = self.image.get_rect()
-            self.x = x
-            self.y = y
-            self.rect.x = x * TILESIZE
-            self.rect.y = y * TILESIZE
-            self.locked = True  #Door is initially locked
+         self.image = pg.Surface((TILESIZE, TILESIZE))
+         self.image.fill(RED)  #change color to represent a door
+         self.rect = self.image.get_rect()
+         self.x = x
+         self.y = y
+         self.rect.x = x * TILESIZE
+         self.rect.y = y * TILESIZE
+         self.locked = True  #Door is initially locked
 
      def unlock(self):
          self.locked = False
