@@ -130,6 +130,31 @@ class Player(pg.sprite.Sprite):
                 if self.status == "Invincible":
                     print("you can't hurt me")
             
+        def die(self):
+        # Handle player death here
+        # For example, reset player position, reduce hitpoints, etc.
+            self.hitpoints -= 10  # Example: reduce hitpoints by 10
+        if self.hitpoints <= 0:
+            # Player has no hitpoints left, handle game over or any other game over actions
+            print("Game Over!")
+            # You might want to reset the game, display a game over screen, etc.
+
+    def update(self):
+        self.get_keys()
+        # Other update logic...
+
+        # Check for collision with mobs
+        self.collide_with_group(self.game.mobs, False)
+    
+    def collide_with_group(self, group, kill):
+        hits = pg.sprite.spritecollide(self, group, kill)
+        if hits:
+            for hit in hits:
+                # Check if the collided object is a Mob
+                if isinstance(hit, Mob) or isinstance(hit, Mob2):
+                    # Player touched a mob, trigger player death
+                    self.die()
+    
 
                 
 
@@ -189,27 +214,27 @@ class Wall(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-#create class for unlockable door that opens after key is collected
-class Door(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.doors
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)  #change color to represent a door
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
-        self.locked = True  #Door is initially locked
+# #create class for unlockable door that opens after key is collected
+ class Door(pg.sprite.Sprite):
+     def __init__(self, game, x, y):
+         self.groups = game.all_sprites, game.doors
+         pg.sprite.Sprite.__init__(self, self.groups)
+         self.game = game
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image.fill(RED)  #change color to represent a door
+            self.rect = self.image.get_rect()
+            self.x = x
+            self.y = y
+            self.rect.x = x * TILESIZE
+            self.rect.y = y * TILESIZE
+            self.locked = True  #Door is initially locked
 
-    def unlock(self):
-        self.locked = False
-        self.image.fill(BLACK)  #Change the color to represent an open door
+     def unlock(self):
+         self.locked = False
+         self.image.fill(BLACK)  #Change the color to represent an open door
 
-    def disappear(self):
-        self.kill()  #Remove the door from the sprite groups
+     def disappear(self):
+         self.kill()  #Remove the door from the sprite groups
 
 
 #create class for coins
@@ -287,6 +312,7 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
+
     
 
 

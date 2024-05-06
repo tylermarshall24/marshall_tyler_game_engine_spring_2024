@@ -46,6 +46,12 @@ class Game:
             for line in f:
                 print(line)
                 self.map_data.append(line)
+        
+
+
+
+
+
 
     # Create run method which runs the whole GAME
     def new(self):
@@ -76,7 +82,7 @@ class Game:
                 if tile == 'U':
                     PowerUp(self, col, row)
                 if tile == 'D':
-                    Door(self, col, row)
+                     Door(self, col, row)
                 
         
 
@@ -177,6 +183,38 @@ class Game:
                 if event.type == pg.KEYUP:
                     waiting = False
 
+    def change_level(self, lvl):
+        self.currLvl = lvl
+        # kill all existing sprites first to save memory
+        for s in self.all_sprites:
+            s.kill()
+        # reset criteria for changing level
+        self.player.moneybag = 0
+        # reset map data list to empty
+        self.map_data = []
+        # open next level
+        with open(path.join(self.game_folder, lvl), 'rt') as f:
+            for line in f:
+                print(line)
+                self.map_data.append(line)
+        # repopulate the level with stuff
+        for row, tiles in enumerate(self.map_data):
+            print(row)
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    print("a wall at", row, col)
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+                if tile == 'C':
+                    Coin(self, col, row)
+                if tile == 'M':
+                    Mob(self, col, row)
+                if tile == 'U':
+                    PowerUp(self, col, row)
+                 if tile == 'D' :
+                     Door(self, col, row)
+
 # Instantiate the game... 
 g = Game()
 # use game method run to run
@@ -187,9 +225,9 @@ while True:
     g.show_go_screen()
 
     '''
-    primary goal: add more levels and a boss fight
+    primary goal: add a boss fight
     
-    secondary goal: add animation to sprites
+    beta goal: add a door to a separate room 
     
-    release verison: add graphics in the backgorund like a map to traverse around
+    final verison: add forcefield/immunity if pass Boss fight
     '''
