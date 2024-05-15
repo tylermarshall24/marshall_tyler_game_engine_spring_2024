@@ -155,8 +155,7 @@ class Player(pg.sprite.Sprite):
                     # Player touched a mob, trigger player death
                     self.die()
     
-
-                
+        
 
     def update(self):
         self.get_keys()
@@ -250,6 +249,78 @@ class Coin(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+
+    # Define the BossSprite class
+class BossSprite(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        # Initialize the sprite
+        pg.sprite.Sprite.__init__(self)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(RED)  # Assume RED color for boss sprite
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.speed = 3  # Speed of boss movement
+        self.attack_cooldown = 1000  # Time between attacks (in milliseconds)
+        self.last_attack_time = 0
+
+    def update(self):
+        # Move the boss horizontally
+        self.rect.x += self.speed
+        # Check for collision with walls
+        hits = pg.sprite.spritecollide(self, self.game.walls, False)
+        for hit in hits:
+            if self.speed > 0:  # Moving right
+                self.rect.right = hit.rect.left
+            else:  # Moving left
+                self.rect.left = hit.rect.right
+            self.speed *= -1  # Reverse direction
+
+        # Perform attacks
+        now = pg.time.get_ticks()
+        if now - self.last_attack_time > self.attack_cooldown:
+            self.attack()
+            self.last_attack_time = now
+
+    
+def attack(self):
+    # Calculate the direction towards the player
+    player_x, player_y = self.game.player.rect.center
+    boss_x, boss_y = self.rect.center
+    direction = pg.math.Vector2(player_x - boss_x, player_y - boss_y)
+    direction.normalize()  # Normalize the vector to get a unit vector
+
+    # Create a projectile and add it to the sprite groups
+    projectile = Projectile(self.rect.centerx, self.rect.centery, direction)
+    self.game.all_sprites.add(projectile)
+    self.game.projectiles.add(projectile)
+
+# Create a Projectile class
+class Projectile(pg.sprite.Sprite):
+    def __init__(self, x, y, direction):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.Surface((10, 10))  # Placeholder image for projectile
+        self.image.fill(YELLOW)  # Assume YELLOW color for projectile
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.speed = 5  # Speed of projectile
+        self.direction = direction  # Direction vector of projectile
+
+    def update(self):
+        # Move the projectile in its direction
+        self.rect.x += self.speed * self.direction.x
+        self.rect.y += self.speed * self.direction.y
+
+        # Check for collision with walls or player
+        hits = pg.sprite.spritecollide(self, self.game.walls, True)  # Assuming walls can be destroyed by projectiles
+        if hits:
+            self.kill()  # Destroy projectile if it hits a wall
+        if pg.sprite.collide_rect(self, self.game.player):
+            # Implement player damage logic here
+            self.game.player.health -= 10  # Example: Reduce player health on collision
+            self.kill()  # Destroy projectile on collision with player
+
 
 #create class for powerups
 class PowerUp(pg.sprite.Sprite):

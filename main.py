@@ -46,12 +46,31 @@ class Game:
             for line in f:
                 print(line)
                 self.map_data.append(line)
-        
 
+    def __init__(self):
+        # Initialize Pygame
+        pg.init()
+        # Set size of screen and create the screen
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        pg.display.set_caption(TITLE)
+        # Set up the clock
+        self.clock = pg.time.Clock()
 
+    def __init__(self):
+        # Initialize other attributes...
+        self.doors = pg.sprite.Group()  # Initialize doors group
 
+    def new(self):
+        # Other initialization code...
+        self.doors = pg.sprite.Group()  # Reset doors group when starting a new level
 
-
+    def __init__(self):
+        # Initialize Pygame
+        pg.init()
+        # Set size of screen and create the screen
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        pg.display.set_caption(TITLE)
+        # Initialize other attributes...
 
     # Create run method which runs the whole GAME
     def new(self):
@@ -171,6 +190,7 @@ class Game:
                 pg.time.wait(1000)  # Wait for 1 second
             self.quit()
 
+
     
     def wait_for_key(self):
         waiting = True
@@ -183,37 +203,7 @@ class Game:
                 if event.type == pg.KEYUP:
                     waiting = False
 
-    def change_level(self, lvl):
-        self.currLvl = lvl
-        # kill all existing sprites first to save memory
-        for s in self.all_sprites:
-            s.kill()
-        # reset criteria for changing level
-        self.player.moneybag = 0
-        # reset map data list to empty
-        self.map_data = []
-        # open next level
-        with open(path.join(self.game_folder, lvl), 'rt') as f:
-            for line in f:
-                print(line)
-                self.map_data.append(line)
-        # repopulate the level with stuff
-        for row, tiles in enumerate(self.map_data):
-            print(row)
-            for col, tile in enumerate(tiles):
-                if tile == '1':
-                    print("a wall at", row, col)
-                    Wall(self, col, row)
-                if tile == 'P':
-                    self.player = Player(self, col, row)
-                if tile == 'C':
-                    Coin(self, col, row)
-                if tile == 'M':
-                    Mob(self, col, row)
-                if tile == 'U':
-                    PowerUp(self, col, row)
-                if tile == 'D' :
-                     Door(self, col, row)
+
 
 # Instantiate the game... 
 g = Game()
