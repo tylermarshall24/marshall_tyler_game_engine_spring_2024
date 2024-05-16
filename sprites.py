@@ -317,7 +317,6 @@ class Projectile(pg.sprite.Sprite):
         if hits:
             self.kill()  # Destroy projectile if it hits a wall
         if pg.sprite.collide_rect(self, self.game.player):
-            # Implement player damage logic here
             self.game.player.health -= 10  # Example: Reduce player health on collision
             self.kill()  # Destroy projectile on collision with player
 
