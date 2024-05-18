@@ -8,7 +8,7 @@ from utils import *
 from random import choice
 from os import path
 
-vec =pg.math.Vector2
+vec = pg.math.Vector2
 
 # making it impossible for the player to go through walls
 def collide_with_walls(sprite, group, dir):
@@ -50,9 +50,9 @@ class Player(pg.sprite.Sprite):
         self.status = ""
         self.hitpoints = 100
         self.cooling = False
-        self.pos = vec(0,0)
-        self.vaulthit = 0    
-    
+        self.pos = vec(self.x, self.y)
+        self.vaulthit = 0   
+
     def get_keys(self):
         self.vx, self.vy = 0, 0 
         keys = pg.key.get_pressed()
@@ -72,23 +72,24 @@ class Player(pg.sprite.Sprite):
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
             self.vy *= 0.7071
+    
     def pew(self):
         p = PewPew(self.game, self.rect.x, self.rect.y)
         print(p.rect.x)
         print(p.rect.y)
 
-    # def move(self, dx=0, dy=0):
-    #     if not self.collide_with_walls(dx, dy):
-    #         self.x += dx
-    #         self.y += dy
+    def move(self, dx=0, dy=0):
+        if not self.collide_with_walls(dx, dy):
+            self.x += dx
+            self.y += dy
 
-    # def collide_with_walls(self, dx=0, dy=0):
-    #     for wall in self.game.walls:
-    #         if wall.x == self.x + dx and wall.y == self.y + dy:
-    #             return True
-    #     return False
+    def collide_with_walls(self, dx=0, dy=0):
+        for wall in self.game.walls:
+            if wall.x == self.x + dx and wall.y == self.y + dy:
+                return True
+        return False
             
-    def collide_with_walls(self, dir):
+    def collide_with_walls_dir(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
@@ -130,10 +131,10 @@ class Player(pg.sprite.Sprite):
                 if self.status == "Invincible":
                     print("you can't hurt me")
             
-        def die(self):
+    def die(self):
         # Handle player death here
         # For example, reset player position, reduce hitpoints, etc.
-            self.hitpoints -= 10  # Example: reduce hitpoints by 10
+        self.hitpoints -= 10  # Example: reduce hitpoints by 10
         if self.hitpoints <= 0:
             # Player has no hitpoints left, handle game over or any other game over actions
             print("Game Over!")
@@ -155,8 +156,6 @@ class Player(pg.sprite.Sprite):
                     # Player touched a mob, trigger player death
                     self.die()
     
-        
-
     def update(self):
         self.get_keys()
         # self.power_up_cd.ticking()
@@ -164,9 +163,9 @@ class Player(pg.sprite.Sprite):
         self.y += self.vy * self.game.dt
         # this order of operations for rect settings and collision is imperative
         self.rect.x = self.x
-        self.collide_with_walls('x')
+        self.collide_with_walls_dir('x')
         self.rect.y = self.y
-        self.collide_with_walls('y')
+        self.collide_with_walls_dir('y')
         # added coin collection with a cooldown setting
         self.collide_with_group(self.game.coins, True)
         if self.game.cooldown.cd < 1:
@@ -180,7 +179,7 @@ class PewPew(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.pew_pews
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
+        self.image = pg.Surface((TILESIZE / 4, TILESIZE / 4))
         self.image.fill(ORANGE)
         self.rect = self.image.get_rect()
         self.x = x
@@ -189,11 +188,13 @@ class PewPew(pg.sprite.Sprite):
         self.rect.y = y
         self.speed = 10
         print("I created a pew pew...")
+    
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
             if str(hits[0].__class__.__name__) == "Coin":
                 self.moneybag += 1
+    
     def update(self):
         self.collide_with_group(self.game.coins, True)
         self.rect.y -= self.speed
@@ -215,28 +216,44 @@ class Wall(pg.sprite.Sprite):
 
 # #create class for unlockable door that opens after key is collected
 class Door(pg.sprite.Sprite):
-     def __init__(self, game, x, y):
-         self.groups = game.all_sprites, game.doors
-         pg.sprite.Sprite.__init__(self, self.groups)
-         self.game = game
-         self.image = pg.Surface((TILESIZE, TILESIZE))
-         self.image.fill(RED)  #change color to represent a door
-         self.rect = self.image.get_rect()
-         self.x = x
-         self.y = y
-         self.rect.x = x * TILESIZE
-         self.rect.y = y * TILESIZE
-         self.locked = True  #Door is initially locked
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.walls
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
 
-     def unlock(self):
-         self.locked = False
-         self.image.fill(BLACK)  #Change the color to represent an open door
+class Mob(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.mobs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
 
-     def disappear(self):
-         self.kill()  #Remove the door from the sprite groups
+class Mob2(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.mobs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
 
-
-#create class for coins
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.coins
@@ -245,12 +262,12 @@ class Coin(pg.sprite.Sprite):
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
 
-    # Define the BossSprite class
+   # Define the BossSprite class
 class BossSprite(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         # Initialize the sprite
@@ -321,23 +338,23 @@ class Projectile(pg.sprite.Sprite):
             self.kill()  # Destroy projectile on collision with player
 
 
-#create class for powerups
 class PowerUp(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.power_ups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(PURPLE)
+        self.image.fill(BLACK)
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
 
 #creating class for mob 2 (wont be used in my version)
 class Mob(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, image):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
