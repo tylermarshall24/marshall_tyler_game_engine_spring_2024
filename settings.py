@@ -6,6 +6,7 @@ FPS = 30
 TITLE = "My Fun Game"
 
 TILESIZE = 32
+BOSSSIZE = 80
 
 # defining colors with values of RGB
 BLACK = (0,0,0)

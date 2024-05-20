@@ -344,7 +344,7 @@ class PowerUp(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(BLACK)
+        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'chest.png')).convert_alpha(), (TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -354,13 +354,12 @@ class PowerUp(pg.sprite.Sprite):
 
 #creating class for mob 2 (wont be used in my version)
 class Mob(pg.sprite.Sprite):
-    def __init__(self, game, x, y, image):
+    def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
-        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'goomba.png')).convert_alpha(), (TILESIZE, TILESIZE))
+        self.image = pg.transform.scale(pg.image.load(path.join(self.game.img_folder, 'Bowser.png')).convert_alpha(), (BOSSSIZE, BOSSSIZE))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
